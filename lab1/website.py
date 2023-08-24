@@ -16,18 +16,18 @@ class MyServer(BaseHTTPRequestHandler):
         user_connection.ping()
 
 
-        # mydb = mysql.connector.connect(
-        # host="mysql",
-        # user="root",
-        # password=""
-        # )
+#        mydb = mysql.connector.connect(
+#        host="mysql",
+#        user="root",
+#        password=""
+#        )
 
-        # print(mydb) 
+#        print(mydb) 
 
         self.send_response(200)
         self.send_header("Content-type", "text/html")
         self.end_headers()
-        self.wfile.write(bytes("</body>HELLO WORLD</html>", "utf-8"))
+        self.wfile.write(bytes("</body>HELLO WORLD 3</html>", "utf-8"))
         
         
     def get_DATA():
