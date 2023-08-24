@@ -1,0 +1,38 @@
+version: '3'
+services:
+  mysql:
+    image: mysql:8.1.0
+    container_name: mysql
+    networks:
+      - website
+
+  
+  redis:
+    image: redis:6.2-alpine
+    networks:
+      - website
+    command: redis-server --save 20 1 --loglevel warning
+    ports:
+      - '6379:6379'
+
+    container_name: redis
+
+
+  web:
+    image: website:latest
+    environment:
+      - CELERY_BROKER_URL=amqp://user:password@rabbitmq:5672
+    volumes:
+      - ./app:/app
+    networks:
+      - website
+    ports:
+      - "0.0.0.0:80:80"
+    depends_on:
+      - mysql
+      - redis
+
+
+networks:
+  website:
+    name: website_network
