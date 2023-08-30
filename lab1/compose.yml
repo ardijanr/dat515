@@ -42,4 +42,4 @@ services:
 
 networks:
   website:
-    name: website_network
+    name: website
