@@ -3,8 +3,6 @@ FROM python:3.10.12-bullseye
 WORKDIR /my_website
 
 RUN apt -y update && apt -y upgrade
-RUN apt install iputils-ping -y
-RUN python --version
 RUN pip install redis mysql-connector-python
 
 COPY ./website.py ./website.py
