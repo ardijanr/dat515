@@ -1,0 +1,86 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: peertube
+spec:
+  selector:
+    app: peertube
+  ports:
+    - port: 9000
+      targetPort: 9000
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: peertube-config
+data:
+  production.yaml: |
+    webserver:
+      https: false
+      hostname: peertube.localhost
+      port: 9000
+    object_storage:
+      enabled: true
+      endpoint: 'minio'
+
+      web_videos:
+        bucket_name: 'peertube-videos'
+        prefix: 'web-videos/'
+        base_url: ''
+
+      streaming_playlists:
+        bucket_name: 'peertube-videos'
+        prefix: 'streaming-playlist/'
+        base_url: ''
+    
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: peertube
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: peertube
+  template:
+    metadata:
+      labels:
+        app: peertube
+    spec:
+      containers:
+      - name: peertube
+        image: chocobozzz/peertube:production-bullseye
+        imagePullPolicy: Always
+        env:
+          - name: PEERTUBE_DB_HOSTNAME
+            value: postgresql
+          - name: PEERTUBE_DB_USERNAME
+            value: <username>
+          - name: PEERTUBE_DB_PASSWORD
+            value: <password>
+          - name: PEERTUBE_DB_SSL
+            value: "false"
+          - name: PEERTUBE_ADMIN_EMAIL
+            value: dat515@devmode.app
+          - name: PEERTUBE_WEBSERVER_HOSTNAME
+            value: peertube.localhost
+          - name: PEERTUBE_SECRET
+            value: <secret>
+          - name: AWS_ACCESS_KEY_ID
+            value: <key_id>
+          - name: AWS_SECRET_ACCESS_KEY
+            value: <key_secret>
+          - name: PT_INITIAL_ROOT_PASSWORD
+            value: <password>
+        ports:
+        - containerPort: 9000
+        volumeMounts:
+        - name: config-volume
+          mountPath: /config/production.yaml
+          readOnly: true
+          subPath: production.yaml
+      volumes:
+      - name: config-volume
+        configMap:
+          name: peertube-config
