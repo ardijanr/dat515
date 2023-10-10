@@ -31,8 +31,34 @@ spec:
       containers:
       - name: minio
         image: quay.io/minio/minio:latest
+        ports:
+        - containerPort: 9000
+          hostPort: 9090
+        - containerPort: 9001
+          hostPort: 9001
         args:
         - server
         - /data
         - "--console-address"
         - :9001
+        env:
+          - name: MINIO_DOMAIN
+            value: dat515.devmode.app
+        volumeMounts:
+        - name: minio-persistent-storage
+          mountPath: /data
+      volumes:
+      - name: minio-persistent-storage
+        persistentVolumeClaim:
+          claimName: minio-pvc
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: minio-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 30Gi
