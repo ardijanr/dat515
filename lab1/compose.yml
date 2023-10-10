@@ -1,17 +1,11 @@
 version: '3'
 services:
+
   web_build:
     build: .
     image: web:latest
     network_mode: "host"
 
-  mysql:
-    image: mysql:8.1.0
-      #container_name: mysql
-    networks:
-      - website
-
-  
   redis:
     image: redis:6.2-alpine
     networks:
@@ -33,9 +27,7 @@ services:
     command: python3 website.py
     depends_on:
       - web_build
-      - mysql
       - redis
-
 
 networks:
   website:
